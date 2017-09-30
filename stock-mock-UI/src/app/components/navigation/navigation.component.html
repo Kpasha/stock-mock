@@ -1,0 +1,13 @@
+<div class="my-nav">
+  <div style="float:left;">
+    <h3 class="my-nav-header">
+      <a routerLink="/">StockMock</a>
+    </h3>
+  </div>
+  
+  <div style="position:fixed;right:0;margin-right:15px;">
+    <a *ngIf="user && currentRoute.url == '/'" style="margin-right:20px;">{{ user.displayName }}</a>
+    <a *ngIf="currentRoute.url == '/login'" routerLink="/register">Register</a>
+    <a *ngIf="currentRoute.url == '/'" (click)="logout()">Logout</a>
+  </div>
+</div>

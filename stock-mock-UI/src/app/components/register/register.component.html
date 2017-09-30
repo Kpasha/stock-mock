@@ -1,0 +1,23 @@
+<div class="my-container">
+  <div class="container">
+    <div>
+      <input class="form-control" type="email" placeholder="email" [(ngModel)]="formObj.email" name="email"><br>
+      <input class="form-control" type="text" placeholder="name"  [(ngModel)]="formObj.name" name="name"><br>
+      <input class="form-control" type="password" placeholder="password"  [(ngModel)]="formObj.password" name="password"><br>
+      <input class="form-control" type="password" placeholder="confirm password"  [(ngModel)]="formObj.passwordConfirm" name="passwordConfirm"><br>
+    </div>
+  
+    <div *ngIf="errorObj.hasError" class="alert-danger error-box">
+      <strong>Registration Failed</strong> {{ errorObj.errorMessage }}
+    </div>
+  
+    <div *ngIf="successObj.hasSuccess" class="alert-success error-box">
+        <strong>Registration Success</strong> {{ successObj.successMessage }}
+      </div>
+    
+    <button class="btn btn-success"
+            (click)="register()">
+            register
+    </button>
+  </div>  
+</div>

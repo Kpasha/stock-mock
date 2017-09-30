@@ -1,0 +1,140 @@
+<div class="my-container">
+    <div class="container">
+        
+      <div  style="border: 1px solid #cecece; padding: 10px;border-radius:5px;margin-bottom:20px;">
+        <div class="row">
+            <div class="col-xs-8">
+              <div class="row" style="padding:10px">
+                <div class="col-xs-9">
+                    <input type="text" 
+                          [(ngModel)]="textInput" 
+                          name="textInput" 
+                          class="form-control" 
+                          style="height:50px;"
+                          placeholder="Enter a Symbol" />
+                </div>
+                <div class="col-xs-3" align="left" style="margin-left:-25px;">
+                  <button (click)="querySymbol()" class="btn btn-info" style="height:50px">Search</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-4">
+              <h4>Balance: ${{ user.balance }}</h4>
+              <h4>Net: ${{ user.net }}</h4>
+            </div>
+          </div>
+      </div>
+    
+      <div *ngIf="retrievedQuote" style="border: 1px solid #cecece;border-radius:5px;padding:10px;margin-bottom:20px;padding:15px;">
+        <div class="row">
+            <div class="col-xs-9">
+                <span *ngIf="retrievedQuote.Name == 'N/A'">Not Found</span>
+                <span *ngIf="retrievedQuote.Name != 'N/A'"><strong>{{ retrievedQuote.Name }}</strong></span><br>
+                <span *ngIf="retrievedQuote.Name != 'N/A'"><strong>Price:</strong> ${{ retrievedQuote.LatestTradePrice }}</span>
+            </div>
+            <div class="col-xs-3" align="right">
+              <button class="btn btn-success" 
+                      *ngIf="retrievedQuote.Name != 'N/A'"
+                      (click)="addToList(retrievedQuote)">
+                <i class="glyphicon glyphicon-plus"></i>
+              </button>
+            </div>
+        </div>
+      </div>
+    
+      <div class="watchlist"> 
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let stock of watchlist">
+            <div class="row">
+              <div class="col-xs-6">
+                <span><strong><a (click)="retrieveHistorical(stock)">{{ stock.name || stock.symbol }}</a></strong></span><br>
+                <span><strong>Price:</strong> ${{ stock.price }}</span><br>
+                <span><strong>Owned:</strong> {{ stock.owned }} shares</span>
+              </div>
+              <div class="col-xs-6" align="right">
+                  <button class="btn btn-success" 
+                          data-toggle="modal" 
+                          data-target="#buyModal"
+                          (click)="openModal(stock)">Buy</button>
+                          <button class="btn btn-warning" 
+                          data-toggle="modal" 
+                          data-target="#sellModal"
+                          [disabled]="stock.owned == 0"
+                          (click)="openModal(stock)">Sell</button>
+                  <button class="btn btn-danger" 
+                          (click)="removeFromList(stock)" 
+                          [disabled]="stock.owned > 0" style="width:50px;"><i class="glyphicon glyphicon-trash"></i></button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    
+      <div *ngIf="chart.options.series.length > 0" id="historical-container">
+        <div [chart]="chart"></div>
+      </div>
+    
+    </div>
+</div>
+
+
+<div id="buyModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" (click)="closeBuyModal()">&times;</button>
+        <h4 class="modal-title">Purchase {{ selectedStock.name }}</h4>
+      </div>
+      <div class="modal-body">
+        <p>Funds Available: ${{ user.balance }}</p>
+        <p>Price: ${{ selectedStock.price }}</p>
+        <p>Owned: {{ selectedStock.owned }}</p>
+        <input type="number" placeholder="quantity" class="form-control" [(ngModel)]="quantity" name="quantity" />
+      </div>
+      <div class="modal-footer row">
+        <div class="col-xs-8" align="left">
+            <p *ngIf="quantity">
+                {{ quantity }} shares x ${{ selectedStock.price }} = <strong>${{ (quantity * selectedStock.price).toFixed(2) }}</strong>
+            </p>
+        </div>
+        <div class="col-xs-4" align="right">
+            <button type="button" class="btn btn-success" data-dismiss="modal" (click)="buyStock()" [disabled]="quantity * selectedStock.price > user.balance || quantity == null">Buy</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" (click)="closeBuyModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sellModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" (click)="closeBuyModal()">&times;</button>
+          <h4 class="modal-title">Sell {{ selectedStock.name }}</h4>
+        </div>
+        <div class="modal-body">
+          <p>Funds Available: ${{ user.balance }}</p>
+          <p>Price: ${{ selectedStock.price }}</p>
+          <p>Owned: {{ selectedStock.owned }}</p>
+          <input type="number" placeholder="quantity" class="form-control" [(ngModel)]="quantity" name="quantity" />
+        </div>
+        <div class="modal-footer row">
+          <div class="col-xs-8" align="left">
+              <p *ngIf="quantity">
+                  {{ quantity }} shares x ${{ selectedStock.price }} = <strong>${{ (quantity * selectedStock.price).toFixed(2) }}</strong>
+              </p>
+          </div>
+          <div class="col-xs-4" align="right">
+              <button type="button" 
+                      class="btn btn-warning" 
+                      data-dismiss="modal" 
+                      (click)="sellStock()" 
+                      [disabled]="quantity > selectedStock.owned || quantity == null">Sell</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal" (click)="closeBuyModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

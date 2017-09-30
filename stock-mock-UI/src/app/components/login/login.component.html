@@ -1,0 +1,12 @@
+<div class="my-container">
+  <div class="container ">
+    <input class="form-control" type="email" placeholder="email" #email><br>
+    <input class="form-control" type="password" placeholder="password" #password><br>
+  
+    <div *ngIf="errorObj.hasError" class="alert-danger error-box">
+      <strong>Login Failed</strong> {{ errorObj.errorMessage }}
+    </div>
+  
+    <button class="btn btn-info" (click)="login(email.value, password.value)">login</button>
+  </div>
+</div>
